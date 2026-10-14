@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>praktikum2 html form</title>
+  <style>
+    /* ===== Warna (gaya wireframe, otomatis terang/gelap) ===== */
+    :root { --bg:#efefef; --card:#fff; --text:#111; --line:#111; --bar:#b5b5b5; --green:#1b9a2b; --green-text:#1b7a28; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#1c1c1c; --card:#2b2b2b; --text:#eee; --line:#cfcfcf; --bar:#444; --green:#22a834; --green-text:#4cd05f; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text);
+           font:14px/1.4 "Comic Sans MS","Chalkboard SE","Segoe UI",sans-serif; }
+    .hidden { display:none; }
+    .page { max-width:820px; margin:0 auto; padding:16px; }
+
+    /* ===== Menu navigasi ===== */
+    .nav { display:flex; justify-content:space-around; flex-wrap:wrap; gap:8px; margin:0 auto 22px;
+           padding:5px 10px; background:var(--card); border:2px solid var(--line); }
+    .nav a { color:var(--text); text-decoration:none; cursor:pointer; }
+    .nav a:hover { text-decoration:underline; }
+    .nav i { font-style:normal; }
+
+    /* ===== Layout: gambar kiri, isian kanan ===== */
+    .layout { display:grid; grid-template-columns:170px 1fr; gap:24px; }
+    .pic { width:170px; height:170px; border:2px solid var(--line); background:var(--card); overflow:hidden; }
+    .pic svg, .pic img { width:100%; height:100%; display:block; object-fit:cover; }
+    .pic line { stroke:var(--line); stroke-width:2; }
+
+    /* ===== Baris isian ===== */
+    .row { display:grid; grid-template-columns:160px 1fr; gap:10px; align-items:start; margin-bottom:10px; max-width:600px; }
+    .row > label, .row > .lbl { text-align:right; padding-top:4px; }
+    .indent { margin-left:170px; }
+    .note { margin:2px 0 8px 170px; font-size:12px; }
+    input[type=text], input[type=number], select, textarea {
+      width:100%; padding:4px 6px; font:inherit; color:var(--text);
+      background:var(--card); border:2px solid var(--line); border-radius:0; }
+    textarea { height:95px; resize:vertical; }
+    select.small { width:60px; }
+    input[readonly] { background:var(--bg); cursor:default; }
+    input[readonly]:focus { outline:none; }
+    .val { padding-top:4px; }
+    .chk { display:flex; align-items:center; gap:8px; margin:4px 0 4px 170px; color:var(--green-text); }
+
+    /* ===== Tombol ===== */
+    .btn { display:block; margin:26px auto 0; padding:6px 22px; font:700 13px inherit; color:#fff;
+           background:var(--green); border:2px solid var(--line); cursor:pointer; box-shadow:2px 2px 0 var(--line); }
+    .btn-up { margin:8px 0 0; padding:3px 10px; color:var(--text); background:var(--card); }
+
+    @media (max-width:640px) {
+      .layout { grid-template-columns:1fr; }
+      .row { grid-template-columns:1fr; gap:3px; }
+      .row > label, .row > .lbl { text-align:left; }
+      .indent, .note, .chk { margin-left:0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================= HALAMAN 1: GENERATE LINK ================= -->
+<div id="pageForm" class="page">
+  <div class="nav">
+    <a onclick="show('form')">Home</a><i>|</i>
+    <a onclick="show('form')">Generate Link</a><i>|</i>
+    <a onclick="alert('Transaction History masih kosong.')">Transaction History</a><i>|</i>
+    <a onclick="alert('Policy: pesanan yang sudah dibayar tidak dapat dibatalkan.')">Policy</a><i>|</i>
+    <a onclick="alert('Anda telah logout.')">Logout</a>
+  </div>
+
+  <form onsubmit="generate(event)">
+    <div class="layout">
+      <!-- Gambar -->
+      <div>
+        <div class="pic" id="preview">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="0" y2="100"/></svg>
+        </div>
+        <input type="file" id="file" accept="image/*" class="hidden">
+        <button type="button" class="btn btn-up" onclick="document.getElementById('file').click()">Upload Picture</button>
+      </div>
+
+      <!-- Isian -->
+      <div>
+        <div class="row"><label for="title">Title Here :</label>
+          <input type="text" id="title" placeholder="Nasi Goreng Spesial" required></div>
+
+        <div class="row"><label for="desc">Description :</label>
+          <textarea id="desc" placeholder="Jumlah Porsi : 2&#10;Level Pedas : Sedang&#10;Catatan : Tanpa bawang"></textarea></div>
+
+        <div class="row"><label for="acc">Account Number :</label>
+          <input type="text" id="acc" placeholder="123-456-789-0" required></div>
+
+        <div class="row"><label for="bank">Bank :</label>
+          <select id="bank"><option>BCA</option><option>Mandiri</option><option>BNI</option><option>BRI</option><option>BSI</option><option>CIMB Niaga</option><option>Permata</option></select></div>
+
+        <div class="row"><label for="holder">Account Holder :</label>
+          <input type="text" id="holder" placeholder="Name Here" required></div>
+
+        <div class="row"><label for="qty">Transaction :</label>
+          <div><select id="qty" class="small"></select></div></div>
+        <div class="note">* if the transaction is for 3 person, choose 3 from the drop-down list</div>
+
+        <label class="chk"><input type="checkbox" id="cSms" checked> Send to Mobile Phone</label>
+        <label class="chk"><input type="checkbox" id="cMail" checked> Send to Email</label>
+
+        <div class="row" style="margin-top:22px"><label for="phone">Send to Mobile Phone :</label>
+          <input type="text" id="phone" inputmode="tel" placeholder="081234567890, 081234567891"
+            pattern="\s*(\+62|62|0)8[1-9][0-9]{7,11}(\s*,\s*(\+62|62|0)8[1-9][0-9]{7,11})*\s*"
+            title="Gunakan nomor HP Indonesia, contoh: 081234567890 atau +6281234567890. Pisahkan dengan koma."></div>
+        <div class="row"><label for="email">Send to Email :</label>
+          <input type="text" id="email" placeholder="a@mail.com, b@mail.com"></div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn">Generate Nabr Link</button>
+  </form>
+</div>
+
+<!-- ================= HALAMAN 2: HASIL / PEMBAYARAN (terkunci) ================= -->
+<div id="pageResult" class="page hidden">
+  <div class="nav">
+    <a onclick="show('form')">Home</a><i>|</i>
+    <a onclick="alert('Register')">Register</a><i>|</i>
+    <a onclick="alert('Policy: pesanan yang sudah dibayar tidak dapat dibatalkan.')">Policy</a><i>|</i>
+    <a onclick="alert('About')">About</a>
+  </div>
+
+  <div class="layout">
+    <div class="pic" id="rPic"></div>
+
+    <div>
+      <div class="row"><span class="lbl">Title Here :</span><div class="val" id="rTitle"></div></div>
+      <div class="row"><span class="lbl">Description :</span><div class="val" id="rDesc" style="white-space:pre-line"></div></div>
+      <div class="row"><span class="lbl">Pay to :</span><div class="val" id="rPay"></div></div>
+
+      <div class="row"><label for="ptype">Payment Type :</label>
+        <select id="ptype"><option>Visa Debit</option><option>Mastercard</option><option>Bank Transfer</option></select></div>
+      <div class="row"><label for="rHolder">Account Holder :</label><input type="text" id="rHolder" readonly></div>
+      <div class="row"><label for="rAcc">Account No :</label><input type="text" id="rAcc" readonly></div>
+
+      <label class="chk"><input type="checkbox" id="rcSms" disabled> Send to Mobile Phone</label>
+      <label class="chk"><input type="checkbox" id="rcMail" disabled> Email me copy of transaction</label>
+
+      <div class="row" style="margin-top:18px"><label for="rPhone">Send to Mobile Phone :</label><input type="text" id="rPhone" readonly></div>
+      <div class="row"><label for="rEmail">Send to Email :</label><input type="text" id="rEmail" readonly></div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="pay()">Pay using QuidLink</button>
+</div>
+
+<script>
+  // ===== Helper =====
+  const $ = (id) => document.getElementById(id);
+  let imageData = "";
+
+  // Pilihan jumlah transaksi/orang (1-10)
+  for (let i = 1; i <= 10; i++) $("qty").add(new Option(i, i));
+
+  // Preview gambar upload
+  $("file").addEventListener("change", (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { imageData = r.result; $("preview").innerHTML = `<img src="${imageData}" alt="Picture">`; };
+    r.readAsDataURL(f);
+  });
+
+  // Pindah halaman
+  function show(page) {
+    $("pageForm").classList.toggle("hidden", page !== "form");
+    $("pageResult").classList.toggle("hidden", page !== "result");
+    window.scrollTo(0, 0);
+  }
+
+  // Submit halaman 1 -> isi halaman 2
+  function generate(e) {
+    e.preventDefault();
+    $("rPic").innerHTML = imageData
+      ? `<img src="${imageData}" alt="Picture">`
+      : $("preview").innerHTML;
+    $("rTitle").textContent = $("title").value;
+    $("rDesc").textContent  = $("desc").value || "-";
+    $("rPay").textContent   = `${$("acc").value} (${$("bank").value})`;
+
+    $("rHolder").value = $("holder").value;
+    $("rAcc").value    = $("acc").value;
+    $("rPhone").value  = $("phone").value;
+    $("rEmail").value  = $("email").value;
+    $("rcSms").checked  = $("cSms").checked;
+    $("rcMail").checked = $("cMail").checked;
+    show("result");
+  }
+
+  // Tombol bayar (simulasi)
+  function pay() {
+    alert(`Payment via ${$("ptype").value} successful (simulation).`);
+  }
+</script>
+</body>
+</html>
